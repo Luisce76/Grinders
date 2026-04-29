@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grinders</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --danger: #dc2626;
+      --danger-dark: #b91c1c;
+      --shadow: 0 12px 30px rgba(31, 41, 55, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #eef2ff, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .app { max-width: 1100px; margin: 0 auto; }
+
+    header { margin-bottom: 20px; }
+
+    h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.04em; }
+
+    .subtitle { color: var(--muted); margin-top: 6px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(209, 213, 219, 0.75);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .card h2 { margin: 0 0 16px; font-size: 1.25rem; }
+
+    label { display: block; font-weight: 700; margin-bottom: 7px; font-size: 0.95rem; }
+
+    input, select {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 1rem;
+      background: #fff;
+    }
+
+    input:focus, select:focus {
+      outline: 3px solid rgba(37, 99, 235, 0.18);
+      border-color: var(--primary);
+    }
+
+    .field { margin-bottom: 14px; }
+
+    .buttons { display: flex; gap: 10px; margin-top: 18px; }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.08s ease, background 0.15s ease;
+    }
+
+    button:active { transform: scale(0.98); }
+
+    .primary { background: var(--primary); color: white; flex: 1; }
+    .primary:hover { background: var(--primary-dark); }
+
+    .secondary { background: #e5e7eb; color: var(--text); }
+
+    .danger { background: var(--danger); color: white; }
+    .danger:hover { background: var(--danger-dark); }
+
+    .toolbar {
+      display: flex; gap: 12px; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; flex-wrap: wrap;
+    }
+
+    .toolbar input, .toolbar select { max-width: 220px; }
+
+    .count { color: var(--muted); font-weight: 700; }
+
+    .table-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; min-width: 900px; }
+
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      background: #f9fafb;
+    }
+
+    .score {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: #eef2ff;
+      font-weight: 800;
+    }
+
+    .actions { display: flex; gap: 8px; }
+    .actions button { padding: 8px 10px; font-size: 0.85rem; }
+
+    .empty {
+      padding: 28px; text-align: center; color: var(--muted);
+      background: #f9fafb; border: 1px dashed var(--border); border-radius: 14px;
+    }
+
+    .note { margin-top: 14px; color: var(--muted); font-size: 0.9rem; line-height: 1.4; }
+
+    @media (max-width: 860px) {
+      body { padding: 16px; }
+      .grid { grid-template-columns: 1fr; }
+      h1 { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <h1>Grinders</h1>
+      <div class="subtitle">Track grinder scores, PO#, and grind time. Scores use 1-5, where 5 is the worst score.</div>
+    </header>
+
+    <section class="grid">
+      <form id="grinderForm" class="card">
+        <h2 id="formTitle">Add Grinder</h2>
+        <input type="hidden" id="recordId" />
+
+        <div class="field">
+          <label for="poNumber">PO #</label>
+          <input id="poNumber" type="text" placeholder="e.g. PO12345" required />
+        </div>
+
+        <div class="field">
+          <label for="grinderName">Grinder name</label>
+          <input id="grinderName" type="text" required />
+        </div>
+
+        <div class="field">
+          <label for="materialScore">Material score</label>
+          <select id="materialScore" required>
+            <option value="">Select score</option>
+            <option value="1">1 - Best</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5 - Worst</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="difficultyScore">Difficulty handling score</label>
+          <select id="difficultyScore" required>
+            <option value="">Select score</option>
+            <option value="1">1 - Best</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5 - Worst</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="qualityScore">Quality score</label>
+          <select id="qualityScore" required>
+            <option value="">Select score</option>
+            <option value="1">1 - Best</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5 - Worst</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="grindTime">Total grind time (minutes)</label>
+          <input id="grindTime" type="number" min="0" step="0.01" required />
+        </div>
+
+        <div class="field">
+          <label for="binLocation">Bin location</label>
+          <select id="binLocation" required>
+            <option value="">Select day</option>
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+          </select>
+        </div>
+
+        <div class="buttons">
+          <button type="submit" class="primary">Save Grinder</button>
+          <button type="button" class="secondary" onclick="resetForm()">Clear</button>
+        </div>
+      </form>
+
+      <section class="card">
+        <h2>Saved Grinders</h2>
+        <div id="emptyState" class="empty">No grinders saved yet.</div>
+
+        <div class="table-wrap" id="tableWrap" hidden>
+          <table>
+            <thead>
+              <tr>
+                <th>PO #</th>
+                <th>Name</th>
+                <th>Material</th>
+                <th>Difficulty</th>
+                <th>Quality</th>
+                <th>Time</th>
+                <th>Bin</th>
+                <th>Avg</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="recordsBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "grindersAppRecords";
+    let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+
+    function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
+
+    function avg(r) {
+      return ((+r.materialScore + +r.difficultyScore + +r.qualityScore) / 3).toFixed(2);
+    }
+
+    function render() {
+      const body = document.getElementById("recordsBody");
+      const empty = document.getElementById("emptyState");
+      const table = document.getElementById("tableWrap");
+
+      body.innerHTML = "";
+
+      if (!records.length) {
+        empty.hidden = false;
+        table.hidden = true;
+        return;
+      }
+
+      empty.hidden = true;
+      table.hidden = false;
+
+      records.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${r.poNumber}</td>
+          <td>${r.grinderName}</td>
+          <td>${r.materialScore}</td>
+          <td>${r.difficultyScore}</td>
+          <td>${r.qualityScore}</td>
+          <td>${r.grindTime}</td>
+          <td>${r.binLocation}</td>
+          <td>${avg(r)}</td>
+          <td>
+            <button onclick="edit('${r.id}')">Edit</button>
+            <button onclick="del('${r.id}')">Delete</button>
+          </td>
+        `;
+        body.appendChild(tr);
+      });
+    }
+
+    document.getElementById("grinderForm").onsubmit = e => {
+      e.preventDefault();
+
+      const data = {
+        id: document.getElementById("recordId").value || crypto.randomUUID(),
+        poNumber: document.getElementById("poNumber").value,
+        grinderName: document.getElementById("grinderName").value,
+        materialScore: document.getElementById("materialScore").value,
+        difficultyScore: document.getElementById("difficultyScore").value,
+        qualityScore: document.getElementById("qualityScore").value,
+        grindTime: document.getElementById("grindTime").value,
+        binLocation: document.getElementById("binLocation").value
+      };
+
+      const i = records.findIndex(x => x.id === data.id);
+      if (i >= 0) records[i] = data;
+      else records.push(data);
+
+      save();
+      e.target.reset();
+      document.getElementById("recordId").value = "";
+      render();
+    };
+
+    window.edit = id => {
+      const r = records.find(x => x.id === id);
+      document.getElementById("recordId").value = r.id;
+      document.getElementById("poNumber").value = r.poNumber;
+      document.getElementById("grinderName").value = r.grinderName;
+      document.getElementById("materialScore").value = r.materialScore;
+      document.getElementById("difficultyScore").value = r.difficultyScore;
+      document.getElementById("qualityScore").value = r.qualityScore;
+      document.getElementById("grindTime").value = r.grindTime;
+      document.getElementById("binLocation").value = r.binLocation;
+    };
+
+    window.del = id => {
+      if (!confirm("Delete this record?")) return;
+      records = records.filter(x => x.id !== id);
+      save();
+      render();
+    };
+
+    function resetForm() {
+      document.getElementById("grinderForm").reset();
+      document.getElementById("recordId").value = "";
+    }
+
+    render();
+  </script>
+</body>
+</html>
