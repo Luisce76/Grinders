@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grinders</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --danger: #dc2626;
+      --danger-dark: #b91c1c;
+      --great: #3f8f3d;
+      --moderate: #d4b600;
+      --bad: #c92626;
+      --shadow: 0 12px 30px rgba(31, 41, 55, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #eef2ff, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .app { max-width: 1200px; margin: 0 auto; }
+    header { margin-bottom: 20px; }
+    h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.04em; }
+    .subtitle { color: var(--muted); margin-top: 6px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(209, 213, 219, 0.75);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .card h2 { margin: 0 0 16px; font-size: 1.25rem; }
+    label { display: block; font-weight: 700; margin-bottom: 7px; font-size: 0.95rem; }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 1rem;
+      background: #fff;
+    }
+
+    textarea { min-height: 82px; resize: vertical; }
+
+    input:focus, select:focus, textarea:focus {
+      outline: 3px solid rgba(37, 99, 235, 0.18);
+      border-color: var(--primary);
+    }
+
+    .field { margin-bottom: 14px; }
+    .hint { color: var(--muted); font-size: 0.85rem; margin-top: 6px; line-height: 1.35; }
+
+    .buttons { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.08s ease, background 0.15s ease;
+    }
+
+    button:active { transform: scale(0.98); }
+    .primary { background: var(--primary); color: white; flex: 1; }
+    .primary:hover { background: var(--primary-dark); }
+    .secondary { background: #e5e7eb; color: var(--text); }
+    .danger { background: var(--danger); color: white; }
+    .danger:hover { background: var(--danger-dark); }
+
+    .rating-guide {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .rating-box {
+      border-radius: 14px;
+      padding: 12px;
+      color: #111827;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      min-height: 190px;
+    }
+
+    .rating-box h3 { margin: 0 0 8px; text-align: center; font-size: 1rem; }
+    .rating-box ul { margin: 0; padding-left: 18px; font-size: 0.88rem; line-height: 1.45; }
+    .rating-great { background: #bfe3b6; }
+    .rating-moderate { background: #f2dd3d; }
+    .rating-bad { background: #ef4b4b; color: #111827; }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar input, .toolbar select { max-width: 220px; }
+    .count { color: var(--muted); font-weight: 700; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 1080px; }
+
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      background: #f9fafb;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 92px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-weight: 800;
+      color: white;
+    }
+
+    .Great { background: var(--great); }
+    .Moderate { background: var(--moderate); color: #111827; }
+    .Bad { background: var(--bad); }
+
+    .actions { display: flex; gap: 8px; }
+    .actions button { padding: 8px 10px; font-size: 0.85rem; }
+
+    .empty {
+      padding: 28px;
+      text-align: center;
+      color: var(--muted);
+      background: #f9fafb;
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+    }
+
+    .note { margin-top: 14px; color: var(--muted); font-size: 0.9rem; line-height: 1.4; }
+
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: 1fr; }
+      .rating-guide { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 860px) {
+      body { padding: 16px; }
+      h1 { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <h1>Grinders</h1>
+      <div class="subtitle">Track vendor grinder ratings, grinder names, PO numbers, grind time, and bin locations.</div>
+    </header>
+
+    <section class="grid">
+      <form id="grinderForm" class="card">
+        <h2 id="formTitle">Add Vendor Rating</h2>
+        <input type="hidden" id="recordId" />
+
+        <div class="field">
+          <label for="vendorName">Vendor name</label>
+          <input id="vendorName" type="text" placeholder="e.g. Resource, Quincy, Andex" required />
+        </div>
+
+        <div class="field">
+          <label for="grinderName">Grinder name</label>
+          <input id="grinderName" type="text" placeholder="e.g. Grinder 12" required />
+        </div>
+
+        <div class="field">
+          <label for="poNumber">PO #</label>
+          <input id="poNumber" type="text" placeholder="e.g. PO12345" required />
+        </div>
+
+        <div class="field">
+          <label for="rating">Rating</label>
+          <select id="rating" required>
+            <option value="">Select rating</option>
+            <option value="Great">Great</option>
+            <option value="Moderate">Moderate</option>
+            <option value="Bad">Bad</option>
+          </select>
+          <div class="hint">Use the rating guide on the right to choose Great, Moderate, or Bad.</div>
+        </div>
+
+        <div class="field">
+          <label for="grindTime">Total grind time (minutes)</label>
+          <input id="grindTime" type="number" min="0" step="0.01" placeholder="e.g. 45" required />
+        </div>
+
+        <div class="field">
+          <label for="materialProduced">Material produced</label>
+          <select id="materialProduced" required>
+            <option value="">Select material</option>
+            <option value="SH/SP">SH/SP</option>
+            <option value="SH/SP/light contamination/FL/flakesorter">SH/SP/light contamination/FL/flakesorter</option>
+            <option value="FL(.30)/heavy contamination">FL(.30)/heavy contamination</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="binLocation">Bin location</label>
+          <select id="binLocation" required>
+            <option value="">Select day</option>
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="notes">Notes</label>
+          <textarea id="notes" placeholder="Optional: contamination, cleaning, compression, handling notes"></textarea>
+        </div>
+
+        <div class="buttons">
+          <button type="submit" class="primary" id="saveButton">Save Rating</button>
+          <button type="button" class="secondary" onclick="resetForm()">Clear</button>
+        </div>
+
+        <p class="note">Data is saved locally in this browser.</p>
+      </form>
+
+      <section class="card">
+        <h2>Rating Guide</h2>
+        <div class="rating-guide">
+          <div class="rating-box rating-great">
+            <h3>GREAT</h3>
+            <ul>
+              <li>Time: 45 minutes per bale</li>
+              <li>Produces SH/SP</li>
+              <li>Easy to grind</li>
+              <li>Comes very clean</li>
+            </ul>
+          </div>
+
+          <div class="rating-box rating-moderate">
+            <h3>Moderate</h3>
+            <ul>
+              <li>Time: 1 hour to 1 hour 20 minutes</li>
+              <li>Produces SH/SP, lightly contaminated, FL, or flakesorter</li>
+              <li>Some difficulty grinding or hard to pull apart</li>
+              <li>Some light contamination</li>
+            </ul>
+          </div>
+
+          <div class="rating-box rating-bad">
+            <h3>Bad</h3>
+            <ul>
+              <li>Time: over 1 hour 30 minutes</li>
+              <li>Produces FL(.30) or heavy contamination</li>
+              <li>Difficult to grind or very compressed</li>
+              <li>Heavily contaminated or hard to clean out</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <h2>Saved Vendor Ratings</h2>
+          <span class="count" id="recordCount">0 records</span>
+          <input id="searchInput" type="search" placeholder="Search vendor, grinder, or PO..." />
+          <select id="ratingFilter">
+            <option value="All">All ratings</option>
+            <option value="Great">Great</option>
+            <option value="Moderate">Moderate</option>
+            <option value="Bad">Bad</option>
+          </select>
+        </div>
+
+        <div class="buttons" style="margin-bottom: 16px;">
+          <button type="button" class="secondary" onclick="exportTextFile()">Export Text File</button>
+          <button type="button" class="primary" onclick="emailReport()">Email Report</button>
+        </div>
+
+        <div id="emptyState" class="empty">No vendor ratings saved yet.</div>
+
+        <div class="table-wrap" id="tableWrap" hidden>
+          <table>
+            <thead>
+              <tr>
+                <th>Vendor</th>
+                <th>Grinder</th>
+                <th>PO #</th>
+                <th>Rating</th>
+                <th>Time</th>
+                <th>Material</th>
+                <th>Bin</th>
+                <th>Notes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="recordsBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "grindersAppRecordsV3";
+    let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+
+    const form = document.getElementById("grinderForm");
+    const recordId = document.getElementById("recordId");
+    const vendorName = document.getElementById("vendorName");
+    const grinderName = document.getElementById("grinderName");
+    const poNumber = document.getElementById("poNumber");
+    const rating = document.getElementById("rating");
+    const grindTime = document.getElementById("grindTime");
+    const materialProduced = document.getElementById("materialProduced");
+    const binLocation = document.getElementById("binLocation");
+    const notes = document.getElementById("notes");
+    const searchInput = document.getElementById("searchInput");
+    const ratingFilter = document.getElementById("ratingFilter");
+    const recordCount = document.getElementById("recordCount");
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function cleanCell(value) {
+      return String(value || "")
+        .replaceAll("\t", " ")
+        .replaceAll("\r", " ")
+        .replaceAll("\n", " ");
+    }
+
+    function buildTextReport() {
+      const headers = [
+        "Vendor Name",
+        "Grinder Name",
+        "PO #",
+        "Rating",
+        "Total Grind Time Minutes",
+        "Material Produced",
+        "Bin Location",
+        "Notes"
+      ];
+
+      const rows = records.map((r) => [
+        cleanCell(r.vendorName),
+        cleanCell(r.grinderName),
+        cleanCell(r.poNumber),
+        cleanCell(r.rating),
+        cleanCell(r.grindTime),
+        cleanCell(r.materialProduced),
+        cleanCell(r.binLocation),
+        cleanCell(r.notes)
+      ]);
+
+      return [headers, ...rows]
+        .map((row) => row.join("\t"))
+        .join("\n");
+    }
+
+    function exportTextFile() {
+      const report = buildTextReport();
+      const blob = new Blob([report], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const dateStamp = new Date().toISOString().slice(0, 10);
+
+      link.href = url;
+      link.download = "grinders-vendor-rating-report-" + dateStamp + ".txt";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    function emailReport() {
+      const report = buildTextReport();
+      const subject = encodeURIComponent("Grinders Vendor Rating Report");
+      const body = encodeURIComponent(report);
+      window.location.href = "mailto:?subject=" + subject + "&body=" + body;
+    }
+
+    function render() {
+      const body = document.getElementById("recordsBody");
+      const empty = document.getElementById("emptyState");
+      const table = document.getElementById("tableWrap");
+      const searchTerm = searchInput.value.trim().toLowerCase();
+      const selectedRating = ratingFilter.value;
+
+      const filtered = records.filter((r) => {
+        const matchesSearch =
+          String(r.vendorName || "").toLowerCase().includes(searchTerm) ||
+          String(r.grinderName || "").toLowerCase().includes(searchTerm) ||
+          String(r.poNumber || "").toLowerCase().includes(searchTerm);
+        const matchesRating = selectedRating === "All" || r.rating === selectedRating;
+        return matchesSearch && matchesRating;
+      });
+
+      recordCount.textContent = filtered.length + (filtered.length === 1 ? " record" : " records");
+      body.innerHTML = "";
+
+      if (!filtered.length) {
+        empty.hidden = false;
+        table.hidden = true;
+        return;
+      }
+
+      empty.hidden = true;
+      table.hidden = false;
+
+      filtered.forEach((r) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${escapeHtml(r.vendorName)}</strong></td>
+          <td>${escapeHtml(r.grinderName)}</td>
+          <td>${escapeHtml(r.poNumber)}</td>
+          <td><span class="badge ${escapeHtml(r.rating)}">${escapeHtml(r.rating)}</span></td>
+          <td>${escapeHtml(r.grindTime)} min</td>
+          <td>${escapeHtml(r.materialProduced)}</td>
+          <td>${escapeHtml(r.binLocation)}</td>
+          <td>${escapeHtml(r.notes)}</td>
+          <td>
+            <div class="actions">
+              <button class="secondary" type="button" onclick="editRecord('${r.id}')">Edit</button>
+              <button class="danger" type="button" onclick="deleteRecord('${r.id}')">Delete</button>
+            </div>
+          </td>
+        `;
+        body.appendChild(tr);
+      });
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const data = {
+        id: recordId.value || crypto.randomUUID(),
+        vendorName: vendorName.value.trim(),
+        grinderName: grinderName.value.trim(),
+        poNumber: poNumber.value.trim(),
+        rating: rating.value,
+        grindTime: grindTime.value,
+        materialProduced: materialProduced.value,
+        binLocation: binLocation.value,
+        notes: notes.value.trim()
+      };
+
+      const index = records.findIndex((x) => x.id === data.id);
+      if (index >= 0) {
+        records[index] = data;
+      } else {
+        records.push(data);
+      }
+
+      save();
+      resetForm();
+      render();
+    });
+
+    function resetForm() {
+      form.reset();
+      recordId.value = "";
+      document.getElementById("formTitle").textContent = "Add Vendor Rating";
+      document.getElementById("saveButton").textContent = "Save Rating";
+    }
+
+    window.editRecord = (id) => {
+      const r = records.find((x) => x.id === id);
+      if (!r) return;
+
+      recordId.value = r.id;
+      vendorName.value = r.vendorName || "";
+      grinderName.value = r.grinderName || "";
+      poNumber.value = r.poNumber || "";
+      rating.value = r.rating || "";
+      grindTime.value = r.grindTime || "";
+      materialProduced.value = r.materialProduced || "";
+      binLocation.value = r.binLocation || "";
+      notes.value = r.notes || "";
+      document.getElementById("formTitle").textContent = "Edit Vendor Rating";
+      document.getElementById("saveButton").textContent = "Update Rating";
+      vendorName.focus();
+    };
+
+    window.deleteRecord = (id) => {
+      if (!confirm("Delete this vendor rating?")) return;
+      records = records.filter((x) => x.id !== id);
+      save();
+      render();
+    };
+
+    searchInput.addEventListener("input", render);
+    ratingFilter.addEventListener("change", render);
+
+    render();
+  </script>
+</body>
+</html>
